@@ -3,7 +3,7 @@
 
 - [QUANTAXIS 的事件框架:](#quantaxis-的事件框架)
     - [QATASK - 存在于队列中的标准单元](#qatask---存在于队列中的标准单元)
-    - [QAEVNET - 可扩展的事件任务](#qaevnet---可扩展的事件任务)
+    - [QAEVENT - 可扩展的事件任务](#qaevent---可扩展的事件任务)
     - [QA_Worker - 指定执行事件的对象](#qa_worker---指定执行事件的对象)
     - [QA_Thread - 可自定义线程的带队列方法](#qa_thread---可自定义线程的带队列方法)
     - [QA_Engine - 管理和分配任务的线程对象](#qa_engine---管理和分配任务的线程对象)
@@ -27,7 +27,7 @@ QAENGINE分三个部分
 事件的核心可以简单理解为一个带队列的线程(进程/协程),将事件分类,做成生产者消费者模式,通过队列传递任务
 
 
-![](http://osnhakmay.bkt.clouddn.com/QUANTAXISEvent.png)
+![](http://pic.yutiansut.com/QUANTAXISEvent.png)
 
 ## QATASK - 存在于队列中的标准单元
 
@@ -45,7 +45,7 @@ engine参数指的是在多线程引擎中,使用哪个线程去执行这个task
 callback 是回调函数,该函数不能有参数 ```if callback: callback() else:pass```
 
 ```
-## QAEVNET - 可扩展的事件任务
+## QAEVENT - 可扩展的事件任务
 
 ```QUANTAXIS
 QA_Event是一个可以被继承的基础类,用于给QA_Worker指定事件任务
@@ -111,8 +111,8 @@ thread = QA.QA_Thread()  # 创建一个QA_Thread
 engine = QA.QA_Engine()  # 创建一个QA_Engine
 engine.start()  # engine 开启
 
-engine.create_kernal('backtest')  # engine创建一个叫 backtest的线程
-engine.start_kernal('backtest')  # engine 启动该线程
+engine.create_kernel('backtest')  # engine创建一个叫 backtest的线程
+engine.start_kernel('backtest')  # engine 启动该线程
 
 # 创建一个类,继承QA_Worker
 

@@ -26,13 +26,10 @@ import csv
 import os
 
 from QUANTAXIS.QAUtil import QA_util_log_expection
-
-
 """适用于老代码的回测
 现在已经废弃
 """
-
-
+"""
 def QA_SU_save_account_message(message, client):
     coll = client.quantaxis.backtest_history
     try:
@@ -48,7 +45,7 @@ def QA_SU_save_account_message(message, client):
             'detail': message['body']['account']['detail']
         })
     except:
-        QA_util_log_expection('error in saving backtest account')
+        QA_util_log_expection('QA error in saving backtest account')
 
 
 def QA_SU_save_backtest_message(message, client):
@@ -84,3 +81,4 @@ def QA_SU_save_pnl_to_csv(detail, cookie):
         csvwriter_1.writerow(detail.columns)
         for item in detail:
             csvwriter_1.writerow(item)
+"""

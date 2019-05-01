@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 #coding :utf-8
 #
 # The MIT License (MIT)
@@ -23,12 +25,12 @@
 # SOFTWARE.
 
 import datetime
-from QUANTAXIS import (QA_SU_save_etf_day, QA_SU_save_index_day,
-                       QA_SU_save_stock_block, QA_SU_save_stock_day,
+from QUANTAXIS import (QA_SU_save_etf_day, QA_SU_save_index_day, QA_SU_save_stock_min,
+                       QA_SU_save_stock_block, QA_SU_save_stock_day,QA_SU_save_etf_min,
                        QA_SU_save_stock_list, QA_SU_save_stock_xdxr,
                        QA_util_log_info)
 
-QA_util_log_info('SAVE/UPDATE {}'.format(datetime.datetime.now()))
+print('SAVE/UPDATE {}'.format(datetime.datetime.now()))
 
 QA_SU_save_stock_day('tdx')
 QA_SU_save_stock_xdxr('tdx')

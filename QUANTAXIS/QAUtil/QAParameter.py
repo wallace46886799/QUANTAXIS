@@ -38,15 +38,44 @@ class ORDER_DIRECTION():
     SELL_OPEN 期货 空开
     SELL_CLOSE 期货 多平(空头平旧仓)
 
-
+    ASK  申购
     """
 
     BUY = 1
     SELL = -1
-    BUY_OPEN = 1
-    BUY_CLOSE = 1
-    SELL_OPEN = -1
-    SELL_CLOSE = -1
+    BUY_OPEN = 2
+    BUY_CLOSE = 3
+    BUY_CLOSE = 3
+    SELL_OPEN = -2
+    SELL_CLOSE = -3
+    SELL_CLOSETODAY = -4
+    BUY_CLOSETODAY = 4
+    ASK = 0
+    XDXR = 5
+    OTHER = 6
+
+
+class EXCHANGE_ID():
+    SSE = 'sse' #上交所
+    SZSE = 'szse' #深交所
+    SHFE = 'shfe' # 上期所
+    DCE = 'dce' #大商所
+    CZCE = 'czce' #郑商所
+    CFFEX = 'cffex' #中金所
+
+class OFFSET():
+    """订单的开平仓属性
+    OPEN 股票/期货 开仓
+    CLOSE 股票 卖出
+    CLOSE_HISTORY 期货 平昨
+    CLOSE_TODAY 期货 平今
+    REVERSE 期货 反手(默认先平昨再平今)
+    """
+
+    OPEN = 'OPEN'
+    CLOSE = 'CLOSE'
+    CLOSETODAY = 'CLOSETODAY'
+    REVERSE = 'REVERSE'
 
 
 class ORDER_MODEL():
@@ -61,12 +90,13 @@ class ORDER_MODEL():
     @yutiansut/2017-12-18
     """
 
-    LIMIT = 'limit'  # 限价
-    MARKET = 'market'  # 市价/在回测里是下个bar的开盘价买入/实盘就是五档剩余最优成交价
-    CLOSE = 'close'  # 当前bar的收盘价买入
-    NEXT_OPEN = 'next_open'  # 下个bar的开盘价买入
-    STRICT = 'strict'  # 严格模式/不推荐(仅限回测测试用)
-
+    LIMIT = 'LIMIT'  # 限价
+    ANY = 'MARKET' # 市价(otg兼容)
+    MARKET = 'MARKET'  # 市价/在回测里是下个bar的开盘价买入/实盘就是五档剩余最优成交价
+    CLOSE = 'CLOSE'  # 当前bar的收盘价买入
+    NEXT_OPEN = 'NEXT_OPEN'  # 下个bar的开盘价买入
+    STRICT = 'STRICT'  # 严格模式/不推荐(仅限回测测试用)
+    BEST = 'MARKET' # 中金所  最优成交剩余转限
 
 class ORDER_STATUS():
     """订单状态
@@ -78,33 +108,40 @@ class ORDER_STATUS():
     status4xx 主动撤单
     status500 订单死亡(每日结算) 恢复临时资产    
 
-    200 委托成功,完全交易
-    203 委托成功,未完全成功
-    300 刚创建订单的时候
-    400 已撤单
-    500 服务器撤单/每日结算
 
     订单生成(100) -- 进入待成交队列(300) -- 完全成交(200) -- 每日结算(500)-- 死亡
     订单生成(100) -- 进入待成交队列(300) -- 部分成交(203) -- 未成交(300) -- 每日结算(500) -- 死亡
     订单生成(100) -- 进入待成交队列(300) -- 主动撤单(400) -- 每日结算(500) -- 死亡
     """
 
-    NEW = 100
-    SUCCESS_ALL = 200
-    SUCCESS_PART = 203
-    QUEUED = 300  # queued 用于表示在order_queue中 实际表达的意思是订单存活 待成交
-    CANCEL_ALL = 400
-    SETTLED = 500
+    # NEW = 100
+    # SUCCESS_ALL = 200
+    # SUCCESS_PART = 203
+    # QUEUED = 300  # queued 用于表示在order_queue中 实际表达的意思是订单存活 待成交
+    # CANCEL_ALL = 400
+    # CANCEL_PART = 402
+    # SETTLED = 500
+    # FAILED = 600
+
+    NEW = 'new'
+    SUCCESS_ALL = 'success_all'
+    SUCCESS_PART = 'success_part'
+    QUEUED = 'queued'  # queued 用于表示在order_queue中 实际表达的意思是订单存活 待成交
+    CANCEL_ALL = 'cancel_all'
+    CANCEL_PART = 'cancel_part'
+    SETTLED = 'settled'
+    FAILED = 'failed'
+    NEXT = 'next'  # 当前bar未成交,下一个bar继续等待
 
 
 class AMOUNT_MODEL():
     """订单的成交量
 
-    by_price是按固定成交总额下单,动态计算成交量
-    by_amount 按固定成家量下单
+    by_money是按固定成交总额下单,动态计算成交量
+    by_amount 按固定数量下单
     """
 
-    BY_PRICE = 'by_price'
+    BY_MONEY = 'by_money'
     BY_AMOUNT = 'by_amount'
 
 
@@ -113,14 +150,17 @@ class RUNNING_ENVIRONMENT():
 
     回测
     模拟
+    t0
     实盘
     随机(按算法/分布随机生成行情)/仅用于训练测试
     """
 
     BACKETEST = 'backtest'
     SIMULATION = 'simulation'
+    TZERO = 't0'
     REAL = 'real'
-    RANODM = 'random'
+    RANDOM = 'random'
+    TTS='tts'
 
 
 class TRADE_STATUS():
@@ -132,14 +172,25 @@ class TRADE_STATUS():
     订单失败(比如买卖价格超过涨跌停价格范围,交易量过大等等):400
     """
 
-    SUCCESS = 200
-    PRICE_LIMIT = 202
-    NO_MARKET_DATA = 500
-    FAILED = 400
+    SUCCESS = 'trade_success'
+    PRICE_LIMIT = 'trade_price_limit'  # 只是未成交
+    NO_MARKET_DATA = 'trade_no_market_data'
+    FAILED = 'trade_failed'
 
 
 class MARKET_ERROR():
-    ACCOUNT_EXIST = 'Account has already exist'
+    """市场类的错误
+
+    1. 账户以及存在(不能重复注册)
+    2. 网络中断
+    3. 数据库连接丢失
+    4. 数值/索引不存在
+    """
+
+    ACCOUNT_EXIST = 'ACCOUNT EXIST {}'
+    NETWORK_BROKERN = 'NETWORK BROKEN {}'
+    DATABSECONNECT_LOST = 'DATABASECONNECTION LOST {}'
+    VALUE_NOT_FOUND = 'VALUE_NOT_FOUND'
 
 
 class MARKET_TYPE():
@@ -158,6 +209,8 @@ class MARKET_TYPE():
     比特币/加密货币市场 5
     """
     STOCK_CN = 'stock_cn'  # 中国A股
+    STOCK_CN_B = 'stock_cn_b'  # 中国B股
+    STOCK_CN_D = 'stock_cn_d'  # 中国D股 沪伦通
     STOCK_HK = 'stock_hk'  # 港股
     STOCK_US = 'stock_us'  # 美股
     FUTURE_CN = 'future_cn'  # 国内期货
@@ -182,10 +235,15 @@ class BROKER_TYPE():
     BACKETEST = 'backtest'
     SIMULATION = 'simulation'
     REAL = 'real'
-    RANODM = 'random'
+    RANDOM = 'random'
+    SHIPANE = 'shipane'
+    TTS = 'tts'
 
 
 class EVENT_TYPE():
+    """[summary]
+    """
+
     BROKER_EVENT = 'broker_event'
     ACCOUNT_EVENT = 'account_event'
     MARKET_EVENT = 'market_event'
@@ -195,12 +253,23 @@ class EVENT_TYPE():
 
 
 class MARKET_EVENT():
-    """交易前置事件"""
+    """交易前置事件
+    query_order 查询订单
+    query_assets 查询账户资产
+    query_account 查询账户
+    query_cash 查询账户现金
+    query_data 请求数据
+    query_deal 查询成交记录
+    query_position 查询持仓
+    """
+
     QUERY_ORDER = 'query_order'
     QUERY_ASSETS = 'query_assets'
     QUERY_ACCOUNT = 'query_account'
     QUERY_CASH = 'query_cash'
     QUERY_DATA = 'query_data'
+    QUERY_DEAL = 'query_deal'
+    QUERY_POSITION = 'query_position'
 
 
 class ENGINE_EVENT():
@@ -210,6 +279,8 @@ class ENGINE_EVENT():
     BAR_SETTLE = 'bar_settle'
     DAILY_SETTLE = 'daily_settle'
     UPDATE = 'update'
+    TRANSACTION = 'transaction'
+    ORDER = 'order'
 
 
 class ACCOUNT_EVENT():
@@ -225,6 +296,7 @@ class BROKER_EVENT():
     有加载数据的任务 load data
     撮合成交的任务 broker_trade
 
+    轮询是否有成交记录 query_deal
 
     """
     LOAD_DATA = 'load_data'
@@ -232,6 +304,8 @@ class BROKER_EVENT():
     SETTLE = 'broker_settle'
     DAILY_SETTLE = 'broker_dailysettle'
     RECEIVE_ORDER = 'receive_order'
+    QUERY_DEAL = 'query_deal'
+    NEXT_TRADEDAY = 'next_tradeday'
 
 
 class ORDER_EVENT():
@@ -266,6 +340,7 @@ class FREQUENCE():
     SIXTY_MIN = '60min'  # 60min bar
     CURRENT = 'current'  # 当前bar
     TICK = 'tick'  # transaction
+    REALTIME = 'realtime' # 上下五档/一档
 
 
 class CURRENCY_TYPE():
@@ -285,16 +360,16 @@ class DATASOURCE():
     """数据来源
     """
 
-    WIND = 'wind' # wind金融终端
-    TDB = 'tdb' # wind tdb
-    THS = 'ths' # 同花顺网页
-    TUSHARE = 'tushare' # tushare
-    TDX = 'tdx' # 通达信
-    MONGO = 'mongo' # 本地/远程Mongodb
-    EASTMONEY = 'eastmoney' # 东方财富网
-    CHOICE = 'choice' # choice金融终端
-    CCXT = 'ccxt' # github/ccxt 虚拟货币
-    LOCALFILE = 'localfile' # 本地文件
+    WIND = 'wind'  # wind金融终端
+    TDB = 'tdb'  # wind tdb
+    THS = 'ths'  # 同花顺网页
+    TUSHARE = 'tushare'  # tushare
+    TDX = 'tdx'  # 通达信
+    MONGO = 'mongo'  # 本地/远程Mongodb
+    EASTMONEY = 'eastmoney'  # 东方财富网
+    CHOICE = 'choice'  # choice金融终端
+    CCXT = 'ccxt'  # github/ccxt 虚拟货币
+    LOCALFILE = 'localfile'  # 本地文件
 
 
 class OUTPUT_FORMAT():
